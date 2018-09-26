@@ -186,7 +186,7 @@ $ airmon-ng start wlan0
 ```
 ![image](images/start_wlan0.png)
 
-![image](wlan0mon_monitor.png)
+![image](images/wlan0mon_monitor.png)
 
 5. 开始抓包。
 
@@ -220,7 +220,7 @@ $ airodump-ng wlan0mon
 $ airodump-ng wlan0mon -w 20180922 --beacons 
 
 
-# 查看以保存的文件
+# 查看已保存的文件
 
 $ ls -l
 
@@ -472,10 +472,10 @@ ac:07:5f:4f:7c:c7	HUAWEI P20
 f4:ec:38:22:e9:08	chubanshe
 
 ```
-- 将两个列表中的SSID进行合并，同名SSID只取一个.
+- 将两个列表中的SSID进行合并，同名SSID只取一个.（只根据名称去重是有一点问题的）（对于隐藏的SSID，用cat -v区分，如果是一串0x00，根据0x00的个数判断隐藏的SSID是否是同一SSID，这里我没有抓取到[看上去]SSID为空的，所以只有理论解释。）
 
 ``` bash
-$ sort -m proresponse01.list beacon01.list | sort -k2 -u > ssid01.list
+$ sort -m proresponse01.list beacon01.list | cat -v | sort -k2 -u > ssid01.list
 
 # -m 合并文件，不排序
 
@@ -535,12 +535,13 @@ f4:ec:38:22:e9:08	chubanshe
 
 #### 2. 哪些无线热点是加密/非加密的？加密方式是否可知？
 
-- 判断是否加密根据wlan.fixed.capabilities.privacy判断，0为非加密，1为加密。
+- 判断是否加密根据wlan.fixed.capabilities.privacy判断，0为非加密，1为加密。（要广播Beacon帧，或者有Pro Response帧）
 
 
 ``` bash
-$ tshark -r 20180923-03.cap -Y wlan.fc.type_subtype -T fields -e wlan.sa -e wlan.fixed.capabilities.privacy -e wlan.ssid | sort -d -k2 -u
+$ tshark -r 20180923-03.cap -Y wlan.fc.type_subtype=0x08 -T fields -e wlan.sa -e wlan.fixed.capabilities.privacy -e wlan.ssid | sort -d -k2 -u
 
+$ tshark -r 20180923-03.cap -Y wlan.fc.type_subtype=0x05 -T fields -e wlan.sa -e wlan.fixed.capabilities.privacy -e wlan.ssid | sort -d -k2 -u
 ```
 
 - 01.cap（03.cap类似，就不重复说明）
@@ -566,7 +567,6 @@ da:64:c7:23:57:55	1	CMCC
 9c:6f:52:6e:6d:3e	1	CU_YGsD
 a2:ed:2c:7a:4b:a1	1	iPhone (37)
 94:d9:b3:ca:82:ee	1	TP-LINK_82EE
-94:92:bc:dd:d3:43		360WiFi
 
 ```
 
@@ -582,6 +582,8 @@ $ tshark -r 20180923-03.cap -Y wlan.fixed.auth.alg -T fields -e wlan.sa -e wlan.
 ![image](images/03auth.png)
 
 ![image](images/authwireshark.png)
+
+![image](images/WPA.png)
 
 
 - 在抓包的过程中，只有IPhone这个热点与STA进行了身份认证，加密方式为0.(01.cap中没有认证帧，我认为在抓包的过程中，有人通过输入密码的方式连接加密的无线热点，才会有认证帧的出现，如果是自动连接，那就不会有认证的过程，所以很难抓到认证帧。)
@@ -610,7 +612,5 @@ $ tshark -r 20180923-03.cap -Y wlan.fixed.auth.alg -T fields -e wlan.sa -e wlan.
   3. Probe Request
 
   ![image](images/wlanssid.png)
-
-
 
 
