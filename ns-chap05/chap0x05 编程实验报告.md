@@ -4,9 +4,9 @@
   - connect（）
   - 完成TCP三次握手
 
-![](C:/ns-chap05/images/tcp_cs1.png)
+![](images/tcp_cs1.png)
 
-![](C:/ns-chap05/images/tcp_cs2.png)
+![](images/tcp_cs2.png)
 
 - 编程实现（tcp_connect_scan.py）
 
@@ -35,9 +35,9 @@ elif (tcp_connect_scan_resp.haslayer(TCP)):
 ```
 - 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
 
-![](C:/ns-chap05/images/tcs_a.png)
+![](images/tcs_a.png)
 
-![](C:/ns-chap05/images/tss_w.png)
+![](images/tss_w.png)
 
 - 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
 
@@ -47,9 +47,9 @@ elif (tcp_connect_scan_resp.haslayer(TCP)):
 ns -ls 80
 ```
 
-![](C:/ns-chap05/images/tcs_aa.png)
+![](images/tcs_aa.png)
 
-![](C:/ns-chap05/images/tcs_ww.png)
+![](images/tcs_ww.png)
 
 - 可以看到输出为“*Open*”，并且完成了三次握手。
 
@@ -57,9 +57,9 @@ ns -ls 80
 
 - 实现原理：
 
-![](C:/ns-chap05/images/ts_scan1.png)
+![](images/ts_scan1.png)
 
-![](C:/ns-chap05/images/tcp_cs2.png)
+![](images/tcp_cs2.png)
 
 - 编程实现（stealth_scan.py）
 
@@ -93,9 +93,9 @@ elif (stealth_scan_resp.haslayer(ICMP)):
 ```
 - 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
 
-![](C:/ns-chap05/images/tss_a.png)
+![](images/tss_a.png)
 
-![](C:/ns-chap05/images/tss_w.png)
+![](images/tss_w.png)
 
 - 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
 
@@ -106,20 +106,20 @@ elif (stealth_scan_resp.haslayer(ICMP)):
 ns -ls 80
 ```
 
-![](C:/ns-chap05/images/tss__aa.png)
+![](images/tss__aa.png)
 
-![](C:/ns-chap05/images/tss_ww.png)
+![](images/tss_ww.png)
 
 - 可以看到输出为“*Open*”。
 
 ## TCP XMAS scan
  - 实现原理：设置TCP报文头FIN、URG和PUSH标记
 
-![](C:/ns-chap05/images/tx_scan1.png)
+![](images/tx_scan1.png)
 
-![](C:/ns-chap05/images/tx_scan2.png)
+![](images/tx_scan2.png)
 
-![](C:/ns-chap05/images/tx_scan3.png)
+![](images/tx_scan3.png)
 
 
 - 编程实现（stealth_scan.py）
@@ -150,9 +150,9 @@ elif (xmas_scan_resp.haslayer(ICMP)):
 ```
 - 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
 
-![](C:/ns-chap05/images/txs_aa.png)
+![](images/txs_aa.png)
 
-![](C:/ns-chap05/images/txs_ww.png)
+![](images/txs_ww.png)
 
 - 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
 
@@ -163,9 +163,9 @@ nc -lp 80
 ```
 
 
-![](C:/ns-chap05/images/txs_a.png)
+![](images/txs_a.png)
 
-![](C:/ns-chap05/images/txs_w.png)
+![](images/txs_w.png)
 
 - 可以看到输出为“*Open|Filtered*”，并且只有攻击者发送的一个UDP包，没有任何回复。
 
@@ -173,11 +173,11 @@ nc -lp 80
 
 - 实现原理：
 
-![](C:/ns-chap05/images/UDP.png)
+![](images/UDP.png)
 
-![](C:/ns-chap05/images/UDP2.png)
+![](images/UDP2.png)
 
-![](C:/ns-chap05/images/UDP3.png)
+![](images/UDP3.png)
 
 - 编程实现（UDP_scan.py）
 
@@ -208,9 +208,9 @@ elif (udp_scan_resp.haslayer(ICMP)):
 
 - 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
 
-![](C:/ns-chap05/images/udp_aa.png)
+![](images/udp_aa.png)
 
-![](C:/ns-chap05/images/udp_ww.png)
+![](images/udp_ww.png)
 
 - 可以看到输出为“*Closed*”,并且有一个UDP包和一个ICMP Error(Type 3, Code 3),说明Vitcim的53端口是关闭状态。
 
@@ -220,8 +220,8 @@ elif (udp_scan_resp.haslayer(ICMP)):
 ``` 
 ns -ulp 53 
 ```
-![](C:/ns-chap05/images/udp_a.png)
+![](images/udp_a.png)
 
-![](C:/ns-chap05/images/udp_w.png)
+![](images/udp_w.png)
 
 - 可以看到输出为“*Open/Filtered*”,并且只有攻击者发送的一个UDP包，没有任何回复。
