@@ -20,6 +20,7 @@ src_port = RandShort()
 dst_port = 80
 
 pkt = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags="S")
+
 pkt1 = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags="AR")
 tcp_connect_scan_resp = sr1(pkt, timeout=10)
 
@@ -27,24 +28,24 @@ if (str(type(tcp_connect_scan_resp)) == "<type 'NoneType'>"):
     print("Closed")
 elif (tcp_connect_scan_resp.haslayer(TCP)):
     if (tcp_connect_scan_resp.getlayer(TCP).flags == 0x12):
-        send_rst = sr(pkt1, timeout=10)
+        send_rst = sr1(pkt1, timeout=10)
         print("Open")
     elif (tcp_connect_scan_resp.getlayer(TCP).flags == 0x14):
         print("Closed")
 
 ```
-- 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
+- 在Attacker上运行此文件。并在Victim中监听，将收到的包存进cap文件中。
 
 ![](images/tcs_a.png)
 
 ![](images/tss_w.png)
 
-- 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
+- 可以看到输出为“*Closed*”，并且监听到的包只有SYN包和RST包，说明Victim的80端口是关闭状态。
 
-- 在Vitcim中监听80端口后，重新发包。
+- 在Victim中监听80端口后，重新发包。
 
 ``` 
-ns -ls 80
+nc -l -p 80
 ```
 
 ![](images/tcs_aa.png)
@@ -91,19 +92,19 @@ elif (stealth_scan_resp.haslayer(ICMP)):
         print("Filtered")
 
 ```
-- 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
+- 在Attacker上运行此文件。并在Victim中监听，将收到的包存进cap文件中。
 
 ![](images/tss_a.png)
 
 ![](images/tss_w.png)
 
-- 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
+- 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Victim的80端口是关闭状态。
 
 
-- 在Vitcim中监听80端口后，重新发包。
+- 在Victim中监听80端口后，重新发包。
 
 ``` 
-ns -ls 80
+nc -l -p  80
 ```
 
 ![](images/tss__aa.png)
@@ -148,18 +149,18 @@ elif (xmas_scan_resp.haslayer(ICMP)):
         print("Filtered")
 
 ```
-- 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
+- 在Attacker上运行此文件。并在Victim中监听，将收到的包存进cap文件中。
 
 ![](images/txs_aa.png)
 
 ![](images/txs_ww.png)
 
-- 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Vitcim的80端口是关闭状态。
+- 可以看到输出为“*Closed*”，并且监听到的包只有SIN包和RST包，说明Victim的80端口是关闭状态。
 
-- 在Vitcim中监听80端口后，重新发包。
+- 在Victim中监听80端口后，重新发包。
 
 ``` 
-nc -lp 80
+nc -l -p 80
 ```
 
 
@@ -206,22 +207,125 @@ elif (udp_scan_resp.haslayer(ICMP)):
 
 ```
 
-- 在Attacker上运行此文件。并在Vitcim中监听，将收到的包存进cap文件中。
+- 在Attacker上运行此文件。并在Victim中监听，将收到的包存进cap文件中。
 
 ![](images/udp_aa.png)
 
 ![](images/udp_ww.png)
 
-- 可以看到输出为“*Closed*”,并且有一个UDP包和一个ICMP Error(Type 3, Code 3),说明Vitcim的53端口是关闭状态。
+- 可以看到输出为“*Closed*”,并且有一个UDP包和一个ICMP Error(Type 3, Code 3),说明Victim的53端口是关闭状态。
 
 
-- 在Vitcim上监听53端口后，重新发包。
+- 在Victim上监听53端口后，重新发包。
 
 ``` 
-ns -ulp 53 
+nc -u -l -p 53 
 ```
 ![](images/udp_a.png)
 
 ![](images/udp_w.png)
 
 - 可以看到输出为“*Open/Filtered*”,并且只有攻击者发送的一个UDP包，没有任何回复。
+
+- 但是如果修改一下nc启动参数为 ```nc -u -l -p 53 < /etc/passwd ```，然后修改 ```elif (udp_scan_resp.haslayer(UDP)): ```为 ```elif (udp_scan_resp.haslayer(UDP) or udp_scan_resp.getlayer(IP).proto == IP_PROTOS.udp):```,UDP 监听可以按照目前的扫描逻辑判断为「开放」状态。
+
+![](images/UDP_open.png)
+
+- 查看监听到的包，可以看到Victim回复了数据。
+
+![](images/UDP_open_wireshark.png)
+
+
+## nmap扫描
+
+### nmap常用参数
+
+``` 
+nmap --help
+
+-sX： TCP XMAS scan
+-sS： TCP SYN scan
+-sT： TCP connect scan
+-sU： UDP scan
+-p：  port
+-T<0-5>: Set timing template (higher is faster)
+-n：  Never do DNS resolution
+-A：  Enable OS detection, version detection, script scanning, and traceroute
+```
+
+### UDP scan
+
+```
+nmap 192.168.56.104 -p 53 -sU -n -T4 -vv
+```
+
+- nmap扫描```nc -ulp 53``` ,可以看到53端口显示为「关闭」状态：
+
+![](images/nmap_no_etc.png)
+
+- nmap扫描```nc -u -l -p 53 < /etc/passwd ```，可以看到53端口显示为「开放」状态：
+
+![](images/nmap_etc.png)
+
+ 
+- ```nc -ulp 53``` 监听udp/53端口，但不建立连接
+
+- ```nc -u -l -p 53 < /etc/passwd``` 开启文件传输，发送/etc/passwd文件，因此端口是“打开”状态.
+
+### TCP connect scan
+
+``` 
+nmap 192.168.56.104 -p 80 -sT -n -T4 -vv
+```
+
+- 「未监听」80端口。
+
+![](images/nmap_tcs_closed.png)
+
+![](images/nmap_sT_closed.png)
+
+- 「监听」80端口。
+
+![](images/nmap_tcs_open.png)
+
+![](images/nmap_sT_open.png)
+
+### TCP stealth scan
+
+``` 
+nmap 192.168.56.104 -p 80 -sS -n -T4 -vv
+```
+
+- 「未监听」80端口。
+
+![](images/nmap_tss_closed.png)
+
+![](images/nmap_sS_closed.png)
+
+- 「监听」80端口。
+
+![](images/nmap_tss_open.png)
+
+![](images/nmap_sS_open.png)
+
+
+### TCP XMAS scan
+
+``` 
+nmap 192.168.56.104 -p 80 -sX -n -T4 -vv
+```
+
+- 「未监听」80端口。
+
+![](images/nmap_txs_closed.png)
+
+![](images/nmap_sX_closed.png)
+
+- 「监听」80端口。
+
+![](images/nmap_txs_open.png)
+
+![](images/nmap_sX_open.png)
+
+
+- nmap的端口扫描结果和scapy编程结果相同。
