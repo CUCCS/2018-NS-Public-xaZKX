@@ -233,7 +233,7 @@ nc -u -l -p 53
 
 - 查看监听到的包，可以看到Victim回复了数据。
 
-![](images/UDP_open_wireshark.png)
+![](images/udp_open_wireshark.png)
 
 
 ## nmap扫描
