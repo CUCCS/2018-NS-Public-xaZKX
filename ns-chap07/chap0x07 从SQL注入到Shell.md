@@ -208,7 +208,7 @@ UNION SELECT id，username，password FROM users
    # --rules 单词表模式启用单词修改规则
    ```
 
-![image-20181118223223164](/Users/xinke/Library/Application Support/typora-user-images/image-20181118223223164.png)
+![](images/john.png)
 
 3. 使用其他字典进行破解。
 
