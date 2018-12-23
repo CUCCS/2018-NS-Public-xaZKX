@@ -79,7 +79,7 @@ bro -v   # 查看bro版本信息
 
 - 查看当前目录下的文件。
 
-  ![image-20181223130202507](/Users/xinke/Desktop/大三上/网络安全/ns-chap12/images/bro_ls.png)
+  ![](images/bro_ls.png)
 
 - 发现上述bro指令会产生警告信息，但是对本次实验没有影响。可以编辑`mytuning.bro`来解决警告问题。
 
